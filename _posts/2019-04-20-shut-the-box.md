@@ -5,10 +5,8 @@ author_profile: true
 folder: "shut-the-box"
 ipynb: "shut-the-box.ipynb"
 md: "shut-the-box.md"
+excerpt: Something funny happens when you take computer science. You begin to think of problems like this in terms of algorithms and mathematically optimal strategies.
 ---
-
-Get the [jupyter notebook]({{site.baseurl}}/assets/notebooks/{{page.folder}}/{{page.ipynb}})
-
 # Shut the Box with Dynamic Programming
 
 I recently played a game at a friend's house called *shut the box*.
@@ -19,7 +17,7 @@ For example, if the tiles that are up are $1, 3, 4, 6, 7, 8$ and the player roll
 
 Sometimes a roll will be made where it is not possible to put down tiles that add up to the roll. In this case, the game is over. In the original game, you would add up the values on the tiles that are still in the "up" position, and this would be your score. A higher score would be worse. However, in the game we played, our goal was just to put all of the tiles down ("shut the box").
 
-![Game]({{site.baseurl}}/assets/notebooks/{{page.folder}}/game.png)
+![game]({{site.baseurl}}/assets/notebooks/{{page.folder}}/game.png)
 
 We passed the game around many times and we often got close, but none of us won despite trying for a long time.
 
@@ -29,7 +27,7 @@ Some configurations are harder to "win" than others. As a simple example, a conf
 
 A naive approach to this problem would take the current configuration and the current roll, and iterate through each legal move. It would recursively traverse the game tree until it found a winning move, and it would count that towards the total number of winning moves from that configuration.
 
-![Game Tree]({{site.baseurl}}/assets/notebooks/{{page.folder}}/tree.png)
+![tree]({{site.baseurl}}/assets/notebooks/{{page.folder}}/tree.png)
 
 This game tree is compressed. Technically there should be branches for every possible roll of dice one, every possible roll of dice two, and every possible legal move given their sum and the current configuration. The given game tree assumes an initial configuration of the $1, 3, 4, 6, 7$ tiles being up and the dice total being $7$. There are three legal moves, each of which result in a new configuration of tiles. We would count, from each of these configurations, the number of sequences of moves that could possibly lead to a win.
 
@@ -89,10 +87,78 @@ def unique_integer_partitions(n):
 ```python
 for roll_total in range(2, 13):
     for config in unique_integer_partitions(roll_total):
-        print(config, end=' ')
+        print(config)
 ```
 
-    frozenset({2}) frozenset({1, 2}) frozenset({3}) frozenset({1, 3}) frozenset({4}) frozenset({1, 4}) frozenset({2, 3}) frozenset({5}) frozenset({1, 2, 3}) frozenset({1, 5}) frozenset({2, 4}) frozenset({6}) frozenset({1, 2, 4}) frozenset({1, 6}) frozenset({2, 5}) frozenset({3, 4}) frozenset({7}) frozenset({1, 2, 5}) frozenset({1, 3, 4}) frozenset({1, 7}) frozenset({2, 6}) frozenset({3, 5}) frozenset({8}) frozenset({1, 2, 6}) frozenset({1, 3, 5}) frozenset({8, 1}) frozenset({2, 3, 4}) frozenset({2, 7}) frozenset({3, 6}) frozenset({4, 5}) frozenset({9}) frozenset({1, 2, 3, 4}) frozenset({1, 2, 7}) frozenset({1, 3, 6}) frozenset({1, 4, 5}) frozenset({1, 9}) frozenset({2, 3, 5}) frozenset({8, 2}) frozenset({3, 7}) frozenset({4, 6}) frozenset({10}) frozenset({1, 2, 3, 5}) frozenset({8, 1, 2}) frozenset({1, 3, 7}) frozenset({1, 4, 6}) frozenset({1, 10}) frozenset({2, 3, 6}) frozenset({2, 4, 5}) frozenset({9, 2}) frozenset({8, 3}) frozenset({4, 7}) frozenset({5, 6}) frozenset({11}) frozenset({1, 2, 3, 6}) frozenset({1, 2, 4, 5}) frozenset({1, 2, 9}) frozenset({8, 1, 3}) frozenset({1, 4, 7}) frozenset({1, 5, 6}) frozenset({1, 11}) frozenset({2, 3, 7}) frozenset({2, 4, 6}) frozenset({2, 10}) frozenset({3, 4, 5}) frozenset({9, 3}) frozenset({8, 4}) frozenset({5, 7}) frozenset({12})
+    frozenset({2})
+    frozenset({1, 2})
+    frozenset({3})
+    frozenset({1, 3})
+    frozenset({4})
+    frozenset({1, 4})
+    frozenset({2, 3})
+    frozenset({5})
+    frozenset({1, 2, 3})
+    frozenset({1, 5})
+    frozenset({2, 4})
+    frozenset({6})
+    frozenset({1, 2, 4})
+    frozenset({1, 6})
+    frozenset({2, 5})
+    frozenset({3, 4})
+    frozenset({7})
+    frozenset({1, 2, 5})
+    frozenset({1, 3, 4})
+    frozenset({1, 7})
+    frozenset({2, 6})
+    frozenset({3, 5})
+    frozenset({8})
+    frozenset({1, 2, 6})
+    frozenset({1, 3, 5})
+    frozenset({8, 1})
+    frozenset({2, 3, 4})
+    frozenset({2, 7})
+    frozenset({3, 6})
+    frozenset({4, 5})
+    frozenset({9})
+    frozenset({1, 2, 3, 4})
+    frozenset({1, 2, 7})
+    frozenset({1, 3, 6})
+    frozenset({1, 4, 5})
+    frozenset({1, 9})
+    frozenset({2, 3, 5})
+    frozenset({8, 2})
+    frozenset({3, 7})
+    frozenset({4, 6})
+    frozenset({10})
+    frozenset({1, 2, 3, 5})
+    frozenset({8, 1, 2})
+    frozenset({1, 3, 7})
+    frozenset({1, 4, 6})
+    frozenset({1, 10})
+    frozenset({2, 3, 6})
+    frozenset({2, 4, 5})
+    frozenset({9, 2})
+    frozenset({8, 3})
+    frozenset({4, 7})
+    frozenset({5, 6})
+    frozenset({11})
+    frozenset({1, 2, 3, 6})
+    frozenset({1, 2, 4, 5})
+    frozenset({1, 2, 9})
+    frozenset({8, 1, 3})
+    frozenset({1, 4, 7})
+    frozenset({1, 5, 6})
+    frozenset({1, 11})
+    frozenset({2, 3, 7})
+    frozenset({2, 4, 6})
+    frozenset({2, 10})
+    frozenset({3, 4, 5})
+    frozenset({9, 3})
+    frozenset({8, 4})
+    frozenset({5, 7})
+    frozenset({12})
+
 
 This gives us a base to work from when using dynamic programming. For the next step, we can ask "for every configuration of tiles, how many ways can you solve it in two moves?". The answer then becomes simple: how many ways can we make a move that results in a configuration that can be solved in a single move? We can simply iterate through each possible dice roll for each dice, and for each total we can iterate through each legal move. We can then tally up how many of the next configurations can be solved in a single move, and this tells us how many can be solved in two moves. The process is identical for three moves, and so on.
 
@@ -127,7 +193,8 @@ from itertools import chain, combinations
 
 def powerset(iterable):
     s = list(iterable)
-    subsets = chain.from_iterable(combinations(s, size) for size in range(len(s)+1))
+    subsets = chain.from_iterable(
+        combinations(s, size) for size in range(len(s)+1))
     return [frozenset(subset) for subset in subsets]
 ```
 
@@ -154,7 +221,9 @@ We can precompute the available moves for each configuration-roll pair to reduce
 
 
 ```python
-movelist = {config:{roll:list(gen_moves(config, roll)) for roll in range(2, 13)} for config in configs}
+movelist = {config:
+                {roll:list(gen_moves(config, roll)) for roll in range(2, 13)}
+            for config in configs}
 ```
 
 To create our table, we will use a `dict` of `dict`s where the first key is the configuration of tiles and the second key is the number of moves to solve that configuration. This allows us to use our `config`s as keys, and is also a format supported by `pandas` which will let us explore data easily using csv files.
@@ -162,7 +231,9 @@ To create our table, we will use a `dict` of `dict`s where the first key is the 
 
 ```python
 max_moves = 12
-num_moves = {config:{i:0 for i in range(1, max_moves)} for config in configs}
+num_moves = {config:
+                 {i:0 for i in range(1, max_moves)}
+             for config in configs}
 ```
 
 The implementation itself is relatively straightforward. For each number of moves, for each configuration of tiles, we iterate through each legal move and add the number of ways each resulting configuration can be solved. To make things even faster, rather than iterate through each roll of each dice, we can simply iterate through the roll totals ($2$ through $12$) and multiply our counts by the number of ways that total can be rolled.
@@ -186,10 +257,6 @@ ways_to_roll = {
 
 
 ```python
-import time
-
-t0 = time.time()
-
 for move_num in range(1, max_moves):
     for config in configs:
         for roll in range(2, 13):
@@ -199,13 +266,9 @@ for move_num in range(1, max_moves):
                     if len(config_after_move) == 0:
                         num_moves[config][move_num] = ways_to_roll[roll]
                 else:
-                    num_moves[config][move_num] += ways_to_roll[roll]*num_moves[config_after_move][move_num-1]
-
-print(f'Elapsed time: {time.time()-t0:.0f} seconds')
+                    num = num_moves[config_after_move][move_num-1]
+                    num_moves[config][move_num] += ways_to_roll[roll]*num
 ```
-
-    Elapsed time: 0 seconds
-
 
 We can see that the algorithm itself is very quick because it essentially involves table lookups and avoids recursively recomputing work that was already done.
 
@@ -240,14 +303,18 @@ But how do we use this table to actually extract the best move, given a configur
 
 
 ```python
-best_moves = {config:{roll:None for roll in range(2, 13)} for config in configs}
+best_moves = {config:
+                  {roll:None for roll in range(2, 13)}
+              for config in configs}
 
 for config in configs:
     for roll in range(2, 13):
         moves = movelist[config][roll]
         if len(moves) == 0:
             continue
-        num_wins = [sum([num_moves[config - move][move_num] for move_num in range(1, max_moves)]) for move in moves]
+        num_wins = [sum([num_moves[config - move][move_num]
+                         for move_num in range(1, max_moves)])
+                    for move in moves]
         best_move = moves[num_wins.index(max(num_wins))]
         best_moves[config][roll] = best_move
 ```
@@ -310,14 +377,12 @@ Finally, let's evaluate a random strategy versus an optimal strategy:
 
 
 ```python
-t0 = time.time()
-print(f'Random strategy:{100*evaluate(random_strategy):.2f}% (elapsed time: {time.time()-t0:.0f} seconds)')
-t0 = time.time()
-print(f'Optimal strategy:{100*evaluate(optimal_strategy):.2f}% (elapsed time: {time.time()-t0:.0f} seconds)')
+print(f'Random strategy:{100*evaluate(random_strategy):.2f}')
+print(f'Optimal strategy:{100*evaluate(optimal_strategy):.2f}')
 ```
 
-    Random strategy:0.72% (elapsed time: 22 seconds)
-    Optimal strategy:3.92% (elapsed time: 23 seconds)
+    Random strategy:0.71
+    Optimal strategy:3.88
 
 
 I can see why this is an addicting game to play, considering even the optimal strategy wins about one every 25 games. The games themselves are fast to play, taking only a few seconds to play (and microseconds to simulate). It looks like a random strategy works less than $1\%$ of the time and an optimal strategy works around $4\%$ of the time.
