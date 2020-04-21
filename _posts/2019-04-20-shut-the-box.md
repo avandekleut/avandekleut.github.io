@@ -1,14 +1,13 @@
 ---
 permalink: /shut-the-box/
-layout: single
+layout: notebook
 author_profile: true
+title: Shutting the Box with Dynamic Programming
 folder: "shut-the-box"
 ipynb: "shut-the-box.ipynb"
 md: "shut-the-box.md"
 excerpt: Something funny happens when you take computer science. You begin to think of problems like this in terms of algorithms and mathematically optimal strategies.
 ---
-# Shut the Box with Dynamic Programming
-
 I recently played a game at a friend's house called *shut the box*.
 
 At the beginning of the game, **tiles** numbered $1$ through $10$ (some variants go to $9$, some to $12$) are positioned in an "up" position. The player rolls two dice and adds the rolls together. The player then chooses tiles in the "up" position whose numbers add to the roll and puts them in the "down" position. The goal is to eventually put every tile down.

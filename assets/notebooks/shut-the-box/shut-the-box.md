@@ -1,6 +1,6 @@
 ---
 permalink: /shut-the-box/
-layout: single
+layout: notebook
 author_profile: true
 folder: "shut-the-box"
 ipynb: "shut-the-box.ipynb"
