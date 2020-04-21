@@ -6,8 +6,10 @@ title: Shutting the Box with Dynamic Programming
 folder: "shut-the-box"
 ipynb: "shut-the-box.ipynb"
 md: "shut-the-box.md"
+app: "shut-the-box.html"
 excerpt: Something funny happens when you take computer science. You begin to think of problems like this in terms of algorithms and mathematically optimal strategies.
 ---
+
 I recently played a game at a friend's house called *shut the box*.
 
 At the beginning of the game, **tiles** numbered $1$ through $10$ (some variants go to $9$, some to $12$) are positioned in an "up" position. The player rolls two dice and adds the rolls together. The player then chooses tiles in the "up" position whose numbers add to the roll and puts them in the "down" position. The goal is to eventually put every tile down.
@@ -387,3 +389,15 @@ print(f'Optimal strategy:{100*evaluate(optimal_strategy):.2f}')
 I can see why this is an addicting game to play, considering even the optimal strategy wins about one every 25 games. The games themselves are fast to play, taking only a few seconds to play (and microseconds to simulate). It looks like a random strategy works less than $1\%$ of the time and an optimal strategy works around $4\%$ of the time.
 
 I hope you all enjoyed figuring this out with me! Computer science is really about thinking problems through in a logical way and applying the techniques you know to solve it.
+
+I wrote a small web app to help you interactively play Shut the Box! Click on a tile to activate or deactivate it. Type your roll into the roll text area and hit go to get the suggested tiles to put down!
+
+<div id="sketch-div"></div>
+<script src="{{site.baseurl}}/assets/apps/{{page.folder}}/p5.min.js"></script>
+<script src="{{site.baseurl}}/assets/apps/{{page.folder}}/shut-the-box.js"></script>
+<div>
+  <label for="roll">Roll:</label>
+  <input type="text" id="roll">
+  <button type="button" onclick="submit()">Go</button>
+  <p id="result"></p>
+</div>
