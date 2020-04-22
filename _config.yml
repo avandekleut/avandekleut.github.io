@@ -99,7 +99,7 @@ analytics:
 author:
   name             : "Alexander Van de Kleut"
   avatar           : #"assets/config/avatar.jpg" # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio              : "Deep reinforcement learning, computational neuroscience and artificial intelligence."
+  bio              : "Showcasing fun ideas and projects in computer science and machine learning!"
   location         : "University of Waterloo"
   email            : avandekleut@uwaterloo.ca
   home             : true

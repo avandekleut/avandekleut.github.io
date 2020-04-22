@@ -1,6 +1,6 @@
 ---
 permalink: /shut-the-box/
-layout: notebook
+layout: single
 author_profile: true
 title: Shutting the Box with Dynamic Programming
 folder: "shut-the-box"
@@ -8,6 +8,8 @@ ipynb: "shut-the-box.ipynb"
 md: "shut-the-box.md"
 app: "shut-the-box.html"
 excerpt: Something funny happens when you take computer science. You begin to think of problems like this in terms of algorithms and mathematically optimal strategies.
+header:
+  teaser: /assets/shut-the-box/teaser.png
 ---
 
 I recently played a game at a friend's house called *shut the box*.
@@ -18,7 +20,7 @@ For example, if the tiles that are up are $1, 3, 4, 6, 7, 8$ and the player roll
 
 Sometimes a roll will be made where it is not possible to put down tiles that add up to the roll. In this case, the game is over. In the original game, you would add up the values on the tiles that are still in the "up" position, and this would be your score. A higher score would be worse. However, in the game we played, our goal was just to put all of the tiles down ("shut the box").
 
-![game]({{site.baseurl}}/assets/notebooks/{{page.folder}}/game.png)
+![game]({{site.baseurl}}/assets/{{page.folder}}/game.png)
 
 We passed the game around many times and we often got close, but none of us won despite trying for a long time.
 
@@ -28,7 +30,7 @@ Some configurations are harder to "win" than others. As a simple example, a conf
 
 A naive approach to this problem would take the current configuration and the current roll, and iterate through each legal move. It would recursively traverse the game tree until it found a winning move, and it would count that towards the total number of winning moves from that configuration.
 
-![tree]({{site.baseurl}}/assets/notebooks/{{page.folder}}/tree.png)
+![tree]({{site.baseurl}}/assets/{{page.folder}}/tree.png)
 
 This game tree is compressed. Technically there should be branches for every possible roll of dice one, every possible roll of dice two, and every possible legal move given their sum and the current configuration. The given game tree assumes an initial configuration of the $1, 3, 4, 6, 7$ tiles being up and the dice total being $7$. There are three legal moves, each of which result in a new configuration of tiles. We would count, from each of these configurations, the number of sequences of moves that could possibly lead to a win.
 
@@ -390,14 +392,17 @@ I can see why this is an addicting game to play, considering even the optimal st
 
 I hope you all enjoyed figuring this out with me! Computer science is really about thinking problems through in a logical way and applying the techniques you know to solve it.
 
+
 I wrote a small web app to help you interactively play Shut the Box! Click on a tile to activate or deactivate it. Type your roll into the roll text area and hit go to get the suggested tiles to put down!
 
 <div id="sketch-div"></div>
-<script src="{{site.baseurl}}/assets/apps/{{page.folder}}/p5.min.js"></script>
-<script src="{{site.baseurl}}/assets/apps/{{page.folder}}/shut-the-box.js"></script>
+<script src="{{site.baseurl}}/assets/{{page.folder}}/p5.min.js"></script>
+<script src="{{site.baseurl}}/assets/{{page.folder}}/shut-the-box.js"></script>
 <label for="roll">Roll:</label>
 <input type="text" id="roll" onclick="this.value='';">
 <button type="button" onclick="submit();">Go</button>
 <button type="button" onclick="roll();">Roll for me</button>
 <button type="button" onclick="allup();">Reset</button>
 <p id="result"></p>
+
+You can download the notebook [here]({{site.baseurl}}/assets/{{page.folder}}/{{page.ipynb}}).

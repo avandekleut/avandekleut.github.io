@@ -92,6 +92,9 @@
 
   img {
     width: 100%;
+    height: 15em;
+    object-fit: cover;
+    filter: blur(1px);
   }
 }
 
