@@ -395,9 +395,9 @@ I wrote a small web app to help you interactively play Shut the Box! Click on a 
 <div id="sketch-div"></div>
 <script src="{{site.baseurl}}/assets/apps/{{page.folder}}/p5.min.js"></script>
 <script src="{{site.baseurl}}/assets/apps/{{page.folder}}/shut-the-box.js"></script>
-<div>
-  <label for="roll">Roll:</label>
-  <input type="text" id="roll">
-  <button type="button" onclick="submit()">Go</button>
-  <p id="result"></p>
-</div>
+<label for="roll">Roll:</label>
+<input type="text" id="roll" onclick="this.value='';">
+<button type="button" onclick="submit();">Go</button>
+<button type="button" onclick="roll();">Roll for me</button>
+<button type="button" onclick="allup();">Reset</button>
+<p id="result"></p>

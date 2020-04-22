@@ -96,20 +96,35 @@ function getup(){
   return up.toString().split(",").join(", ")
 }
 
-function submit(){
-  const roll = document.getElementById("roll").value.toString();
-  const result = document.getElementById("result");
-  if (roll){
-    const config = getup();
-    const best_move = lookup_table[config][roll];
-    if (best_move == "None"){
-      result.innerHTML = "No moves left!";
-    } else if (best_move == undefined){
-      result.innerHTML = "Enter a valid roll!";
-    } else {
-      result.innerHTML = best_move;
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function roll(){
+  document.getElementById("roll").value = (getRandomInt(1, 6) + getRandomInt(1, 6)).toString();
+  submit();
+}
+
+function allup(){
+  for (const tile of tiles){
+    if (!tile.up){
+      tile.onclick();
     }
+  }
+}
+
+function submit(){
+  let roll = document.getElementById("roll").value.toString();
+  const result = document.getElementById("result");
+  const config = getup();
+  const best_move = lookup_table[config][roll];
+  if (best_move == "None"){
+    result.innerHTML = "No moves left!";
+  } else if (best_move == undefined){
+    result.innerHTML = "Enter a valid roll!";
   } else {
-    result.innerHTML = "Type in a roll!";
+    result.innerHTML = best_move;
   }
 }
