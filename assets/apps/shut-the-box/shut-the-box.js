@@ -125,6 +125,6 @@ function submit(){
   } else if (best_move == undefined){
     result.innerHTML = "Enter a valid roll!";
   } else {
-    result.innerHTML = best_move;
+    result.innerHTML = "Best move: "+best_move;
   }
 }
