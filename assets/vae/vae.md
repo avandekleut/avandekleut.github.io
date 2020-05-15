@@ -11,15 +11,13 @@ header:
   teaser: /assets/vae/variational-autoencoder.png
 ---
 
-I have been thinking about making this post on autoencoders and variational autoencoders for a while. I was first exposed to autoencoders when I first started learning about neural networks in 2017, and later to variational autoencoders. At first I didn't really understand the math, but was happy to follow a [keras tutorial](https://blog.keras.io/building-autoencoders-in-keras.html) detailing how to implement autoencoders.
-
 # Motivation
 
-Imagine that we have a large, high-dimensional dataset. For example, imagine that our dataset consists of thousands of images. Each image might consist of hundreds of pixels, so each data point might have hundreds of dimensions. The *[manifold hypothesis](https://deepai.org/machine-learning-glossary-and-terms/manifold-hypothesis)* states that real-world high-dimensional data actually consists of *low-dimensional* data that is **embedded** in the high-dimensional space. What does this mean? It means that, which the actual data itself might have hundreds of dimensions, the *structure* of the data can be sufficiently described using only a few dimensions.
+Imagine that we have a large, high-dimensional dataset. For example, imagine we have a dataset consisting of thousands of images. Each image  is made up of hundreds of pixels, so each data point has hundreds of dimensions. The **[manifold hypothesis](https://deepai.org/machine-learning-glossary-and-terms/manifold-hypothesis)** states that real-world high-dimensional data actually consists of low-dimensional data that is embedded in the high-dimensional space. This means that, while the actual data itself might have hundreds of dimensions, the underlying structure of the data can be sufficiently described using only a few dimensions.
 
-This is the motivation behind *dimensionality reduction* techniques, which try to take high-dimensional data and *project* it onto a lower-dimensional surface. For humans who visualize most things in 2D (or sometimes 3D), this usually means projecting the data onto a 2D surface. Examples of dimensionality reduction techniques include [principal component analysis (PCA)](https://en.wikipedia.org/wiki/Principal_component_analysis) and [t-SNE](https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding). Chris Olah's blog has a [great post](https://colah.github.io/posts/2014-10-Visualizing-MNIST/) reviewing some dimensionality reduction techniques applied to the MNIST dataset.
+This is the motivation behind dimensionality reduction techniques, which try to take high-dimensional data and project it onto a lower-dimensional surface. For humans who visualize most things in 2D (or sometimes 3D), this usually means projecting the data onto a 2D surface. Examples of dimensionality reduction techniques include [principal component analysis (PCA)](https://en.wikipedia.org/wiki/Principal_component_analysis) and [t-SNE](https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding). Chris Olah's blog has a [great post](https://colah.github.io/posts/2014-10-Visualizing-MNIST/) reviewing some dimensionality reduction techniques applied to the MNIST dataset.
 
-Neural networks are often used in the **supervised learning** context, where data consists of pairs $(x, y)$ and the network learns a function $f:X \to Y$. This context applies to both **regression** (where $y$ is a continuous function of $x$) and **classification** (where $y$ is a discrete label for $x$). However, neural networks have shown considerable power in the **unsupervised learning** context, where data just consists of points $x$. There are no "targets" or "labels" $y$. Instead, the goal is to learn and understand the *structure* of the data. In the case of dimensionality reduction, the goal is to find a *low-dimensional representation* of the data.
+Neural networks are often used in the **supervised learning** context, where data consists of pairs $(x, y)$ and the network learns a function $f:X \to Y$. This context applies to both regression (where $y$ is a continuous function of $x$) and classification (where $y$ is a discrete label for $x$). However, neural networks have shown considerable power in the **unsupervised learning** context, where data just consists of points $x$. There are no "targets" or "labels" $y$. Instead, the goal is to learn and understand the structure of the data. In the case of dimensionality reduction, the goal is to find a low-dimensional representation of the data.
 
 # Autoencoders
 
@@ -30,8 +28,6 @@ The encoder learns a non-linear transformation $e:X \to Z$ that projects the dat
 A decoder learns a non-linear transformation $d: Z \to X$ that projects the latent vectors back into the original high-dimensional input space $X$. This transformation should take the latent vector $z = e(x)$ and reconstruct the original input data $\hat{x} = d(z) = d(e(x))$.
 
 An autoencoder is just the composition of the encoder and the decoder $f(x) = d(e(x))$. The autoencoder is trained to minimize the difference between the input $x$ and the reconstruction $\hat{x}$ using a kind of **reconstruction loss**. Because the autoencoder is trained as a whole (we say it's trained "end-to-end"), we simultaneosly optimize the encoder and the decoder.
-
-Reconstruction loss is generaly the **mean-square error** between the input $x$ and output $\hat{x}$, but other losses can be used, such as **binary cross-entropy** is all data is between $0$ and $1$.
 
 ![autoencoder](autoencoder.png)
 
@@ -63,7 +59,7 @@ class Encoder(nn.Module):
         super(Encoder, self).__init__()
         self.linear1 = nn.Linear(784, 512)
         self.linear2 = nn.Linear(512, latent_dims)
-
+    
     def forward(self, x):
         x = torch.flatten(x, start_dim=1)
         x = F.relu(self.linear1(x))
@@ -79,7 +75,7 @@ class Decoder(nn.Module):
         super(Decoder, self).__init__()
         self.linear1 = nn.Linear(latent_dims, 512)
         self.linear2 = nn.Linear(512, 784)
-
+        
     def forward(self, z):
         z = F.relu(self.linear1(z))
         z = torch.sigmoid(self.linear2(z))
@@ -95,7 +91,7 @@ class Autoencoder(nn.Module):
         super(Autoencoder, self).__init__()
         self.encoder = Encoder(latent_dims)
         self.decoder = Decoder(latent_dims)
-
+    
     def forward(self, x):
         z = self.encoder(x)
         return self.decoder(z)
@@ -124,8 +120,8 @@ latent_dims = 2
 autoencoder = Autoencoder(latent_dims).to(device) # GPU
 
 data = torch.utils.data.DataLoader(
-        torchvision.datasets.MNIST('./data',
-               transform=torchvision.transforms.ToTensor(),
+        torchvision.datasets.MNIST('./data', 
+               transform=torchvision.transforms.ToTensor(), 
                download=True),
         batch_size=128,
         shuffle=True)
@@ -156,12 +152,10 @@ plot_latent(autoencoder, data)
 ```
 
 
-![png](output_20_0.png)
+![png](output_18_0.png)
 
 
-We can see that 1 is highly separated from the other numbers. Similarly-shaped numbers are grouped together. For example, 0 and 6 overlap, and 4, 7, and 9 all overlap due to their similar shapes.
-
-We can also sample uniformly from the latent space and see how the decoder reconstructs inputs from latent vectors.
+The resulting latent vectors cluster similar digits together. We can also sample uniformly from the latent space and see how the decoder reconstructs inputs from arbitrary latent vectors.
 
 
 ```python
@@ -183,28 +177,24 @@ plot_reconstructed(autoencoder)
 ```
 
 
-![png](output_23_0.png)
+![png](output_21_0.png)
 
 
-We intentionally plot the reconstructed latent vectors using approximately the same range of values taken on by the actual latent vectors. We can see that the reconstructed latent vectors look like digits, and the kind of digit corresponds to the location of the latent vector in the latent space.
+We intentionally plot the reconstructed latent vectors using approximately the same range of values taken on by the actual latent vectors. We can see that the reconstructed latent vectors look like digits, and the kind of digit corresponds to the location of the latent vector in the latent space. 
 
-One thing you may have noticed, however, is that there are "gaps" in the latent space for the actual data. There are locations that data is never encoded to. When we use the `plot_reconstructed` method, we are essentially sampling uniformly randomly from the latent space and looking at the decoded latent vector as an image. However, there are regions that are not reliably decoded into any particular digit, since those latent vectors were not seen during training. This is evident in, for this random seed (0), the top left of the `plot_reconstructed` image which does not correspond to any digits at all.
+You may have noticed that there are "gaps" in the latent space, where data is never mapped to. This becomes a problem when we try to use autoencoders as **generative models**. The goal of generative models is to take a data set $X$ and produce more data points from the same distribution that $X$ is drawn from. For autoencoders, this means sampling latent vectors $z \sim Z$ and then decoding the latent vectors to produce images. If we sample a latent vector from a region in the latent space that was never seen by the decoder during training, the output might not make any sense at all. We see this in the top left corner of the `plot_reconstructed` output, which is empty in the latent space, and the corresponding decoded digit does not match any existing digits.
 
 # Variational Autoencoders
 
-Variational autoencoders look at the problem of encoding an appropriate latent vector. We can see that the only constraint on the latent vector representation is that it should easily be decodable into the original image. As a result, the latent space $Z$ becomes disjoint and non-continuous. If we wanted to use the latent space from a normal autoencoder to generate digits, we might end up with garbage as a result.
+The only constraint on the latent vector representation for traditional autoencoders is that latent vectors should be easily decodable back into the original image. As a result, the latent space $Z$ can become disjoint and non-continuous. Variational autoencoders try to solve this problem.
 
-Instead, we want to train an encoder that produces a latent space with good properties. We want the latent space to be smooth and continuous so that there are not gaps.
+In traditional autoencoders, inputs are mapped deterministically to a latent vector $z = e(x)$. In variational autoencoders, inputs are mapped to a probability distribution over latent vectors, and a latent vector is then sampled from that distribution. The decoder becomes more robust at decoding latent vectors as a result. 
 
-Instead of outputting a latent vector $z = e(x)$, we output the mean $\mu$ and standard deviation $\sigma$ of a low-dimensional diagonal multivariate Gaussian. We then sample a latent vector $z \sim \mathcal{N}(\mu, \sigma)$.
+Specifically, instead of mapping the input $x$ to a latent vector $z = e(x)$, we map it instead to a mean vector $\mu(x)$ and a vector of standard deviations $\sigma(x)$. These parametrize a diagonal Gaussian distribution $\mathcal{N}(\mu, \sigma)$, from which we then sample a latent vector $z \sim \mathcal{N}(\mu, \sigma)$.
 
-To output the mean and standard deviation, we have two output layers instead of one. Since the standard deviation must be positive, we apply an exponential activation function to the outputs. The network looks like this now:
+This is generally accomplished by replacing the last layer of a traditional autoencoder with two layers, each of which output $\mu(x)$ and $\sigma(x)$. An exponential activation is often added to $\sigma(x)$ to ensure the result is positive.
 
 ![variational autoencoder](variational-autoencoder.png)
-
-The decoder layer is essentially the exact same. The only thing that changes is that the encoder produces two outputs, and they must be combined to produce a **distribution** over latent vectors. We then sample a latent vector from the distribution.
-
-Using a distribution over latent vectors has two advantages. The first is that the decoder must become very good at decoding latent vectors by mapiing a region of the latent space to a particular output, rather than just a single point in the latent space. This helps make it so that we have more "coverage" in the latent space - more of the latent space itself is seen during training so the decoder becomes better at decoding.
 
 However, this does not completely solve the problem. There may still be gaps in the latent space because the outputted means may be significantly different and the standard deviations may be small. To reduce that, we add an **auxillary loss** that penalizes the distribution $p(z \mid x)$ for being too far from the standard normal distribution $\mathcal{N}(0, 1)$. This penalty term is the KL divergence between $p(z \mid x)$ and $\mathcal{N}(0, 1)$, which is given by
 $$
@@ -213,9 +203,9 @@ $$
 
 This expression applies to two univariate Gaussian distributions (the full expression for two arbitrary univariate Gaussians is derived in [this math.stackexchange post](https://stats.stackexchange.com/questions/7440/kl-divergence-between-two-univariate-gaussians)). Extending it to our diagonal Gaussian distributions is not difficult; we simply sum the KL divergence for each dimension.
 
-This loss is useful for two reasons. The first is that we cannot train the encoder network by gradient descent without it since gradients cannot flow through sampling (which is a non-differentiable operation). The second is that, by penalizing the KL divergence in this manner, we can encourage the latent vectors to occupy a more centralized and uniform location. In essence, we force the encoder to find latent vectors approximately in a standard Gaussian distribution that the decoder can then effectively decode.
+This loss is useful for two reasons. First, we cannot train the encoder network by gradient descent without it, since gradients cannot flow through sampling (which is a non-differentiable operation). Second, by penalizing the KL divergence in this manner, we can encourage the latent vectors to occupy a more centralized and uniform location. In essence, we force the encoder to find latent vectors that approximately follow a standard Gaussian distribution that the decoder can then effectively decode.
 
-To implement this, we do not need to change the `Decoder` class. We only need to change the `Encoder` class to produce $\mu$ and $\sigma$, then to sample a latent vector. We also require this class to keep track of the KL penalty.
+To implement this, we do not need to change the `Decoder` class. We only need to change the `Encoder` class to produce $\mu(x)$ and $\sigma(x)$, and then use these to sample a latent vector. We also use this class to keep track of the KL divergence loss term.
 
 
 ```python
@@ -225,12 +215,12 @@ class VariationalEncoder(nn.Module):
         self.linear1 = nn.Linear(784, 512)
         self.linear2 = nn.Linear(512, latent_dims)
         self.linear3 = nn.Linear(512, latent_dims)
-
+        
         self.N = torch.distributions.Normal(0, 1)
         self.N.loc = self.N.loc.cuda() # hack to get sampling on the GPU
         self.N.scale = self.N.scale.cuda()
         self.kl = 0
-
+    
     def forward(self, x):
         x = torch.flatten(x, start_dim=1)
         x = F.relu(self.linear1(x))
@@ -241,7 +231,7 @@ class VariationalEncoder(nn.Module):
         return z
 ```
 
-The autoencoder class changes a single line of code, swappig out an `Encoder` for a `VariationalEncoder`.
+The autoencoder class changes a single line of code, swappig out an `Encoder` for a `VariationalEncoder`. 
 
 
 ```python
@@ -250,7 +240,7 @@ class VariationalAutoencoder(nn.Module):
         super(VariationalAutoencoder, self).__init__()
         self.encoder = VariationalEncoder(latent_dims)
         self.decoder = Decoder(latent_dims)
-
+    
     def forward(self, x):
         z = self.encoder(x)
         return self.decoder(z)
@@ -258,7 +248,7 @@ class VariationalAutoencoder(nn.Module):
 
 In order to train the variational autoencoder, we only need to add the auxillary loss in our training algorithm.
 
-The following code is essentially copy-and-pasted from above, with a single line added.
+The following code is essentially copy-and-pasted from above, with a single term added added to the loss (`autoencoder.encoder.kl`).
 
 
 ```python
@@ -289,7 +279,7 @@ plot_latent(vae, data)
 ```
 
 
-![png](output_39_0.png)
+![png](output_36_0.png)
 
 
 We can see that, compared to the traditional autoencoder, the range of values for latent vectors is much smaller, and more centralized. The distribution overall of $p(z \mid x)$ appears to be much closer to a Gaussian distribution.
@@ -302,7 +292,7 @@ plot_reconstructed(vae, r0=(-3, 3), r1=(-3, 3))
 ```
 
 
-![png](output_41_0.png)
+![png](output_38_0.png)
 
 
 # Conclusions
@@ -311,7 +301,7 @@ Variational autoencoders produce a latent space $Z$ that is more compact and smo
 
 # Extra Fun
 
-One final thing that I wanted to try out was **interpolation**. Given two inputs $x_1$ and $x_2$, and their corresponding latent vectors $z_1$ and $z_2$, we can interpolate between them by decoding latent vectors between $x_1$ and $x_2$.
+One final thing that I wanted to try out was **interpolation**. Given two inputs $x_1$ and $x_2$, and their corresponding latent vectors $z_1$ and $z_2$, we can interpolate between them by decoding latent vectors between $x_1$ and $x_2$. 
 
 The following code produces a row of images showing the interpolation between digits.
 
@@ -346,7 +336,7 @@ interpolate(vae, x_1, x_2, n=20)
 ```
 
 
-![png](output_48_0.png)
+![png](output_45_0.png)
 
 
 
@@ -355,7 +345,7 @@ interpolate(autoencoder, x_1, x_2, n=20)
 ```
 
 
-![png](output_49_0.png)
+![png](output_46_0.png)
 
 
 I also wanted to write some code to generate a GIF of the transition, instead of just a row of images. The code below modifies the code above to produce a GIF.
@@ -364,21 +354,21 @@ I also wanted to write some code to generate a GIF of the transition, instead of
 ```python
 from PIL import Image
 
-def interpolate_gif(autoencoder, filename, x_1, x_2, n=60):
+def interpolate_gif(autoencoder, filename, x_1, x_2, n=100):
     z_1 = autoencoder.encoder(x_1)
     z_2 = autoencoder.encoder(x_2)
-
+    
     z = torch.stack([z_1 + (z_2 - z_1)*t for t in np.linspace(0, 1, n)])
-
+    
     interpolate_list = autoencoder.decoder(z)
     interpolate_list = interpolate_list.to('cpu').detach().numpy()*255
-
+    
     images_list = [Image.fromarray(img.reshape(28, 28)).resize((256, 256)) for img in interpolate_list]
     images_list = images_list + images_list[::-1] # loop back beginning
-
+    
     images_list[0].save(
-        f'{filename}.gif',
-        save_all=True,
+        f'{filename}.gif', 
+        save_all=True, 
         append_images=images_list[1:],
         loop=1)
 ```
