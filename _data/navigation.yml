@@ -1,18 +1,4 @@
-# main links
-main:
-  - title: "Posts"
-    url: /year-archive/
-    description: "Short and sweet."
-  - title: "Projects"
-    url: projects
-    description: "Longer and more in-depth."
-  # - title: "Categories"
-  #   url: /categories/
-  # - title: "Tags"
-  #   url: /tags/
-  # - title: "Pages"
-  #   url: /page-archive/
-  # - title: "Collections"
-  #   url: /collection-archive/
-  # - title: "External Link"
-  #   url: https://google.com
+# # main links
+# main:
+#   - title: "Posts"
+#     url: /posts/

@@ -256,3 +256,10 @@ defaults:
       comments: true
       share: true
       related: true
+
+# Collections
+collections:
+  rl:
+    title: "Reinforcement Learning"
+    output: true
+    sort_by: lesson

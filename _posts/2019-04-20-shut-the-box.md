@@ -5,11 +5,10 @@ author_profile: true
 title: Shutting the Box with Dynamic Programming
 folder: "shut-the-box"
 ipynb: "shut-the-box.ipynb"
-md: "shut-the-box.md"
 app: "shut-the-box.html"
 excerpt: Something funny happens when you take computer science. You begin to think of problems like this in terms of algorithms and mathematically optimal strategies.
 header:
-  teaser: /assets/shut-the-box/teaser.png
+  teaser: /assets/shut-the-box/game.png
 ---
 
 I recently played a game at a friend's house called *shut the box*.
