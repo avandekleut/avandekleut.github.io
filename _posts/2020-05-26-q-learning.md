@@ -5,6 +5,7 @@ author_profile: true
 title: The Mathematical Foundations of Reinforcement Learning
 folder: "q-learning"
 ipynb: "q-learning.ipynb"
+md: "q-learning.md"
 excerpt: All of reinforcement learning is based on the reward hypothesis: Every action of a rational agent can be thought of as seeking to maximize some cumulative scalar reward signal.
 header:
   teaser: /assets/q-learning/mdp.png
