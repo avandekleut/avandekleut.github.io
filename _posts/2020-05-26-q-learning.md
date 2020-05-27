@@ -6,15 +6,10 @@ title: The Mathematical Foundations of Reinforcement Learning
 folder: "q-learning"
 ipynb: "q-learning.ipynb"
 md: "q-learning.md"
-excerpt: All of reinforcement learning is based on the reward hypothesis: Every action of a rational agent can be thought of as seeking to maximize some cumulative scalar reward signal.
+excerpt: Every action of a rational agent can be thought of as seeking to maximize some cumulative scalar reward signal.
 header:
   teaser: /assets/q-learning/mdp.png
 ---
-For my undergraduate thesis, I spent months learning the intricacies of deep reinforcement learning. I ended up [doing research](thesis.pdf) on intrinsic motivation using [sparse distributed memory](https://en.wikipedia.org/wiki/Sparse_distributed_memory) as a kind of hashing function to determine novelty for encouraging exploration.
-
-While I was doing research for my honour's thesis, I found that a lot of the existing materials on deep reinforcement learning were outdated and over-complicated. I decided to make this post to help explain the fundamentals of deep reinforcement learning, and to provide a reference implementation based on the principles described in the [seminal paper](https://storage.googleapis.com/deepmind-media/dqn/DQNNaturePaper.pdf) on deep RL.
-
-# Mathematical foundations of reinforcement learning
 
 All of reinforcement learning is based on the **reward hypothesis**:
 
