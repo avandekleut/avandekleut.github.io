@@ -7,7 +7,7 @@ folder: "q-learning"
 ipynb: "q-learning.ipynb"
 excerpt: All of reinforcement learning is based on the reward hypothesis: Every action of a rational agent can be thought of as seeking to maximize some cumulative scalar reward signal.
 header:
-  teaser: /assets/###################
+  teaser: /assets/q-learning/mdp.png
 ---
 For my undergraduate thesis, I spent months learning the intricacies of deep reinforcement learning. I ended up [doing research](thesis.pdf) on intrinsic motivation using [sparse distributed memory](https://en.wikipedia.org/wiki/Sparse_distributed_memory) as a kind of hashing function to determine novelty for encouraging exploration.
 
