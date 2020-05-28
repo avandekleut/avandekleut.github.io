@@ -20,6 +20,7 @@ We usually think of reinforcement learning scenarios as consisting of an **agent
 ## Markov Process $(\mathcal{S}, \mathcal{P})$
 
 A **Markov process** is a kind of mathematical object used to model stochastic sequences of states $s_0, s_1, \dots, s_T$ that satisfy the **Markov property**:
+
 $$
 p(s_{t+1} \mid s_1, s_2, \dots, s_t) = p(s_{t+1} \mid s_t)
 $$
@@ -138,12 +139,15 @@ Now that we understand what a Markov process is, we can add the next bit: reward
 A Markov reward process is a Markov process that additionally defines a **reward function** $\mathcal{R}$ over state transitions. Given a state transition $(s_t, s_{t+1})$ from our Markov process, we get a scalar reward $r_t$ indicating how "good" that transition was. For example, let's say $s_t$ is standing at the edge of a cliff. If $s_{t+1}$ is off the cliff, then we would get a low reward. If $s_{t+1}$ is back from the edge of the cliff, we get a high reward.
 
 Technically, the reward function defines a probability distribution over rewards for any given state transition. When we run the Markov reward process (i.e., when we generate trajectories) we sample from that distribution to get our **instantaneous reward** $r_t$. The definition for the reward function is thus
+
 $$
 \mathcal{R}(s_t, s_{t+1}) = \mathbb{E}[r_t \mid s_t, s_{t+1}]
 $$
+
 the mean of the distribution.
 
 Sometimes the reward is produced deterministically, so that
+
 $$
 \mathcal{R}(s_t, s_{t+1}) = r_t
 $$
@@ -153,6 +157,7 @@ Also, to simplify analysis, we sometimes simply associate the reward $r_t$ with 
 ![mrp.png]({{site.baseurl}}/assets/{{page.folder}}/mrp.png)
 
 Given a trajectory of state $\{ s_0, s_1, \dots, s_T \}$ we can associate a trajectory of rewards $\{ r_1, r_2, \dots, r_T \}$. The **return** of a trajectory starting at time step $t$ is the sum of the instantaneous rewards from $t$ to $T$ (the end of the trajectory).
+
 $$
 R_t = r_t + r_{t+1} + \dots + r_T = \sum_{k=t}^T r_k
 $$
@@ -162,6 +167,7 @@ Good trajectories are ones with high returns.
 So far it has been implicit that $T$ (the length of the trajectory) is finite. However, this does not have to be the case. In general, trajectories can continue forever (i.e., $T = \infty$). When a Markov process has finite $T$ we say that it is "episodic" (trajectories happen in "episodes"), and if has infinite $T$ we say that it is "continuous". For this reason, we generally refer to $T$ as the **time horizon** for the process.
 
 This poses a problem. If the process is continuous, then there can be many trajectories with the same infinite return $R_t$. If one trajectories sees rewards of $\{ 1, 1, 1, \dots \}$ and one sees rewards of $\{ 100, 100, 100, \dots \}$, they will get the same return $R_t$. However, clearly the second one is better. To get around this, we often use the **discounted return** $G_t$:
+
 $$
 G_t = r_t + \gamma r_{t+1} + \gamma^2 r_{t+2} + \dots = \sum_{k=t}^T \gamma^{k-t} r_k
 $$
@@ -242,9 +248,11 @@ tau_r
 ### Value Function
 
 We can determine how good being in a certain state $s_t$ is using the **value function** $V(s_t)$:
+
 $$
 V(s_t) = \mathbb{E}_\tau [G_t \mid s_t]
 $$
+
 the expected discounted return beginning at state $s_t$. We write the expectation over $\tau$ as a shorthand for $\tau \sim p(\tau \mid s_t, \mathcal{S})$, which means "trajectories $\tau$ sampled from the distribution of trajectories conditional on the initial state $s_t$ and the state transition matrix $\mathcal{S}$". We showed above how to calulate the probability of a trajectory $p(\tau)$, so the notion of a "distribution of trajectories" should be clear.
 
 We can expand $G_t$ in the expectation to yield a recursive formulation of $V(s_t)$:
@@ -270,6 +278,7 @@ $$
 to move our estimate for $V(s_t)$ towards the slightly better estimate, where $\alpha \in (0, 1]$ is a **learning rate** (often close to $0$).
 
 Note that this is equivalent to doing gradient descent on the squared error between $V(s_t)$ and $r_t + \gamma V(s_{t+1})$, holding the latter constant:
+
 $$
 \begin{align}
 L(V(s_t)) &= \frac{1}{2} \left( r_t + \gamma V(s_{t+1}) - V(s_t) \right)^2 \\
@@ -371,12 +380,15 @@ $$
 $$
 
 We can introduce a notion equivalent to the value function $V(s_t)$, but that measures how good state-action pairs $(s_t, a_t)$ are.
+
 $$
 Q(s_t, a_t) = \mathbb{E}_\tau [G_t \mid s_t, a_t]
 $$
+
 the expected discounted return beginning at state $s_t$ and choosing an action $a_t$. We write the expectation over $\tau$ as a shorthand for $\tau \sim p(\tau \mid s_t, a_t, \mathcal{S})$, which means "trajectories $\tau$ sampled from the distribution of trajectories conditional on the initial state $s_t$ and inital action $a_t$, and the state transition matrix $\mathcal{S}$".
 
 We can expand $G_t$ in the expectation to yield a recursive formulation of $Q(s_t, a_t)$ following the exact same method as for $V(s_t)$, yielding
+
 $$
 Q(s_t, a_t) = \mathbb{E}_\tau [r_t + \gamma Q(s_{t+1}, a_{t+1}) \mid s_t, a_t] \\
 $$
@@ -396,20 +408,25 @@ If we frame this in terms of MDPs, this means that the policy should select acti
 Policies come in two flavours: deterministic and stochastic. Deterministic policies are often denoted by $\mu$ and map states directly to actions: $a_t = \mu(s_t)$. Stochastic policies are denoted by $\pi$ and map states to a probability distribution over actions $a_t \sim \pi(\cdot \mid s_t)$. In general, since deterministic policies are just a special case of stochastic policies, we use $\pi$ when referring to policies.
 
 Given a policy $\pi$ we define
+
 $$
 V^\pi (s_t) = \mathbb{E}_\tau \left[ G_t \vert s_t \right]
 $$
+
 Where the expectation over $\tau$ is a shorthand for $\tau \sim p(\tau \mid s_t, a_t, \pi, \mathcal{S})$, which means "trajectories $\tau$ sampled from the distribution of trajectories conditional on the initial state $s_t$, following state dynamics $\mathcal{S}$ and action selection policy $\pi$".
 
 We also likewise define
 
-$$Q^\pi (s_t, a_t) = \mathbb{E}_\tau \left[ G_t \vert s_t, a_t \right]$$
+$$
+Q^\pi (s_t, a_t) = \mathbb{E}_\tau \left[ G_t \vert s_t, a_t \right]
+$$
 
 Where the expectation over $\tau$ is a shorthand for $\tau \sim p(\tau \mid s_t, a_t, \pi, \mathcal{S})$, which means "trajectories $\tau$ sampled from the distribution of trajectories conditional on the initial state $s_t$ and inital action $a_t$, following state dynamics $\mathcal{S}$ and action selection policy $\pi$".
 
 The crucial difference between $V^\pi(s_t)$ and $Q^\pi(s_t, a_t)$ is that $V^\pi(s_t)$ is the expected discounted return if we *always* choose actions following the policy $\pi$, whereas $Q^\pi(s_t, a_t)$ is the expected discounted return if we choose a *specific* action $a_t$, and *then* follow our policy $\pi$ afterwards.
 
 With this understanding, the following relationship should be clear:
+
 $$
 V^\pi(s_t) = \mathbb{E}_{a_t \sim \pi} \left[ Q^\pi(s_t, a_t) \right]
 $$
@@ -522,6 +539,7 @@ tau_pi
 A random policy isn't interesting. Let's consider the notion of an **optimal policy**. What does it mean to have an optimal policy? The optimal policy $\pi^*$ produces trajectories with the highest expected discounted return. Imagine that, for any policy $\pi$ we can automatically determine $V^\pi$ and $Q^\pi$.
 
 An optimal policy $\pi^*$ would then always choose an action $a_t$ at each step which maximizes $Q^{\pi^*}$.
+
 $$
 \pi^*(s_t) = \arg \max_{a_t} Q^{\pi^*}(s_t, a_t)
 $$
