@@ -645,4 +645,4 @@ We can see that the greedy policy does much better than the random policy.
 
 In the next post, we will introduce the OpenAI `gym` module for reinforcement learning and discuss Q-learning and deep-Q-learning in more detail.
 
-You can download the jupyter notebook [here]().
+You can download the jupyter notebook [here]({{site.baseurl}}/assets/{{page.folder}}/{{page.ipynb}}).
