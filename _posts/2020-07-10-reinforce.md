@@ -456,6 +456,6 @@ agent = REINFORCE(env, agent, gamma=0.999, epochs=20)
 ![png]({{site.baseurl}}/assets/{{page.folder}}/output_45_1.png)
 
 
-I hope that this thorough introduction to policy gradients has been helpful! In the next posts, we will diver deeper into actor-critic methods and more advanced policy gradient methods.
+I hope that this thorough introduction to policy gradients has been helpful! In the next posts, we will dive deeper into actor-critic methods and more advanced policy gradient methods.
 
 You can download the notebook [here]({{site.baseurl}}/assets/{{page.folder}}/{{page.ipynb}}).
