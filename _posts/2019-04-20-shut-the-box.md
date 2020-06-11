@@ -1,6 +1,6 @@
 ---
 permalink: /shut-the-box/
-layout: single
+layout: notebook
 author_profile: true
 title: Shutting the Box with Dynamic Programming
 folder: "shut-the-box"
@@ -403,5 +403,3 @@ I wrote a small web app to help you interactively play Shut the Box! Click on a 
 <button type="button" onclick="roll();">Roll for me</button>
 <button type="button" onclick="allup();">Reset</button>
 <p id="result"></p>
-
-You can download the notebook [here]({{site.baseurl}}/assets/{{page.folder}}/{{page.ipynb}}).

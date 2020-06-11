@@ -1,6 +1,6 @@
 ---
 permalink: /q-learning/
-layout: single
+layout: notebook
 author_profile: true
 title: The Mathematical Foundations of Reinforcement Learning
 folder: "q-learning"
@@ -644,5 +644,3 @@ sum(tau_r)
 We can see that the greedy policy does much better than the random policy.
 
 In the next post, we will introduce the OpenAI `gym` module for reinforcement learning and discuss Q-learning and deep-Q-learning in more detail.
-
-You can download the jupyter notebook [here]({{site.baseurl}}/assets/{{page.folder}}/{{page.ipynb}}).

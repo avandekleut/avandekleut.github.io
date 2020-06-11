@@ -1,13 +1,13 @@
 ---
 permalink: /reinforce/
-layout: single
+layout: notebook
 author_profile: true
 title: Policy Gradient Theorem and REINFORCE
 folder: "reinforce"
 ipynb: "reinforce.ipynb"
 excerpt: In order to use continuous action spaces and have stochastic policies, we have to model the policy $\pi$ directly. We can parametrize our policy using some parameters $\theta$ to produce a distribution over actions
 header:
-  teaser: /assets/reinforce/categorical.png
+  teaser: /assets/reinforce/diagonal-gaussian.png
 ---
 
 ## Why $Q$-learning isn't always enough
@@ -457,5 +457,3 @@ agent = REINFORCE(env, agent, gamma=0.999, epochs=20)
 
 
 I hope that this thorough introduction to policy gradients has been helpful! In the next posts, we will dive deeper into actor-critic methods and more advanced policy gradient methods.
-
-You can download the notebook [here]({{site.baseurl}}/assets/{{page.folder}}/{{page.ipynb}}).
