@@ -17,6 +17,8 @@ minimal_mistakes_skin    : "contrast" # "air", "aqua", "contrast", "dark", "dirt
 # Scripts
 head_scripts:
   - assets/js/mathjax/config.js
+footer_scripts:
+  - /assets/js/main.min.js
 
 # Site Settings
 locale                   : "en-US"
