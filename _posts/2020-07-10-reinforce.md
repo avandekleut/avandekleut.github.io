@@ -79,6 +79,7 @@ $$
 Let's take a closer look at the gradient of $\log p(\tau)$ with respect to $\theta$:
 
 $$
+\require{cancel}
 \nabla_\theta \log p(\tau) = \cancel{\log p(s_0)} + \sum_{t=0}^T \Bigg( \cancel{\log p(s_{t+1} \mid s_t, a_t)} + \log \pi_\theta (a_t \mid s_t) \Bigg)
 $$
 
