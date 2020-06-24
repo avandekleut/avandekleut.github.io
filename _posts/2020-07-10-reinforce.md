@@ -9,12 +9,11 @@ excerpt: In order to use continuous action spaces and have stochastic policies, 
 header:
   teaser: /assets/reinforce/diagonal-gaussian.png
 ---
-
 ## Why $Q$-learning isn't always enough
 
-In the [previous post]({% post_url 2020-05-31-dqn %}) we took a deep dive into deep $Q$-learning, the technique that [scored human-level performance](https://www.nature.com/articles/nature14236) from raw pixels on Atari games like Breakout. This technique was developed to allow $Q$-learning on continuous observation spaces. The fundamental limitation of deep $Q$-learning, however, is that it only works on MDPs with discrete action spaces.
+In the [previous post](dqn) we took a deep dive into deep $Q$-learning, the technique that [scored human-level performance](https://www.nature.com/articles/nature14236) from raw pixels on Atari games like Breakout. This technique was developed to allow $Q$-learning on continuous observation spaces $\mathcal{S}$. The fundamental limitation of deep $Q$-learning, however, is that it only work on MDPs with discrete action spaces $\mathcal{A}$.
 
-$Q$-learning works by learning to estimate the values of $Q^\pi(s_t, a_t)$ for every state-action pair $(s_t, a_t)$. Then, given a state $s_t$, it uses a greedy policy that just the action with the highest $Q$ value:
+$Q$-learning works by learning to estimate the values of $Q^\pi(s_t, a_t)$ for every state-action pair $(s_t, a_t)$. Then, given a state $s_t$, it uses a greedy policy that just chooses the action with the highest $Q$ value:
 
 $$
 \pi(a_t \mid s_t) =
@@ -32,87 +31,139 @@ $$
 \pi_\theta(a_t \mid s_t) = p(a_t \mid s_t, \theta)
 $$
 
-## The Policy Gradient Theorem
 
-Like in $Q$-learning (and all of reinforcement learning, really) our goal is to find a policy $\pi$ that maximizes the expected cumulative reward. Let's call the quantity that we want to maximize the **objective** $J$. The value of the objective for a certain policy with parameters $\theta$ is denoted $J(\theta)$.
 
-For an episodic environment (with finite $T$), we usually just consider this objective to be the value of the starting state:
+Like in $Q$-learning (and all of reinforcement learning, really) our goal is to find a policy $\pi$ that maximizes the expected cumulative reward. Let's call the quantity that we want to maximize the **objective** $J$. The objective value for a certain policy with parameters $\theta$ is denoted $J(\theta)$.
 
 $$
-J(\theta) = V^{\pi_\theta}(s_0) = \mathbb{E}_\tau \left[G_0 \mid s_0 \right]
+J(\theta) = \mathbb{E}_\tau \left[ G_0 \mid s_0 \right] = \sum_\tau p(\tau) G_0
 $$
 
-Imagine an MDP with a single timestep $T=1$. Then the objective function looks like
+where $G_0$ is the discounted return from the beginning state of the trajectory $\tau$.
 
-$$
-\begin{aligned}
-J(\theta) &= \mathbb{E}_\tau \left[G_0 \mid s_0 \right] \\
-&= \sum_\tau p(\tau) \mathbb{E} \left[G_0 \mid s_0, \tau \right] \\
-&= \sum_{s_0 \in \mathcal{S}} p(s_0) \mathbb{E}_{a_0} \left[r_0 \mid s_0 \right] \\
-&= \sum_{s_0 \in \mathcal{S}} p_0(s_0) \sum_{a_0 \in \mathcal{A}} \pi_\theta( a_0 \mid s_0) \mathbb{E} \left[r_0 \mid s_0, a_0 \right] \\
-&= \sum_{s_0 \in \mathcal{S}} p_0(s_0) \sum_{a_0 \in \mathcal{A}} \pi_\theta( a_0 \mid s_0) \mathcal{R}(s_0, a_0)
-\end{aligned}
-$$
-
-The first expansion takes the expectation over trajectories and expands it using the chain rule of probability.
-
-The second line replaces $\tau$ with $s_0$ and $G_0$ with $r_0$ since the MDP only has a single timestep.
-
-The third line takes the expectation over actions and expands it using the chain rule of probability.
-
-The last line replaces the expectation over rewards given a state-action pair with $\mathcal{R}$, which is its definition in a Markov reward process (see [q-learning]({% post_url 2020-05-26-q-learning %})).
-
-Given a policy $\pi_\theta$ parametrized by $\theta$, how should we update $\theta$ to maximize the objective $J(\theta)$? We can use **gradient ascent**:
+We want to maximize this objective via **gradient ascent** on $J(\theta)$ with respect to policy parameters $\theta$:
 
 $$
 \theta \gets \theta + \alpha \nabla_\theta J(\theta)
 $$
 
-Taking the gradient with respect to $\theta$ of the objective for the 1-step MDP above gives
+We can use the **log-derivative** trick to express the gradient as
 
 $$
-\nabla_\theta J(\theta) = \sum_{s_0 \in \mathcal{S}} p_0(s_0) \sum_{a_0 \in \mathcal{A}} \nabla_\theta \pi_\theta (a_0 \mid s_0) \mathcal{R}(s_0, a_0)
+\nabla f(x) = f(x) \log \nabla f(x)
 $$
 
-This equation is almost identical to the objective $J(\theta)$ itself, except that we have the gradient of the policy instead of the policy itself. Let's reintroduce the policy term by multiplying and dividing by it (assuming $\pi_\theta(a_0 \mid s_0)$ is nonzero);
+If we apply the log-derivative trick to the gradient of the objective, we get
 
 $$
-\nabla_\theta J(\theta) = \sum_{s_0 \in \mathcal{S}} p_0(s_0) \sum_{a_0 \in \mathcal{A}} \pi_\theta(a_0 \mid s_0) \frac{\nabla_\theta \pi_\theta (a_0 \mid s_0)}{\pi_\theta(a_0 \mid s_0) } \mathcal{R}(s_0, a_0)
+\nabla_\theta J(\theta) = \sum_\tau p(\tau) \nabla_\theta \log p(\tau) G_0
 $$
 
-We can undo the expansion steps from earlier to see that
+To compute the probability of a trajectory.
 
 $$
-\nabla_\theta J(\theta) = \mathbb{E}_{s_0} \left[ \frac{\nabla_\theta \pi_\theta (a_0 \mid s_0)}{\pi_\theta(a_0 \mid s_0) } r_0 \right]
+p(\tau) = p(s_0) \prod_{t=0}^{T} p(s_{t+1} \mid s_t, a_t) \pi_\theta (a_t \mid s_t)
 $$
 
- We can use the following identity to make the expression even simpler:
+This is similar to the equation derived in the [previous post]({% post_url 2020-05-26-q-learning %}) on $Q$-learning, except that we must also include the fact that actions are selected probabilistically according to the policy $\pi_\theta$.
+
+The log-probability of a trajectory $\tau$ is then just
 
 $$
-\frac{\nabla_\theta \pi_\theta (a_0 \mid s_0)}{\pi_\theta(a_0 \mid s_0) }  = \nabla_\theta \log \pi_\theta (a_0 \mid s_0)
+\begin{align}
+\log p(\tau) &= \log \left(p(s_0) \prod_{t=0}^{T} p(s_{t+1} \mid s_t, a_t) \pi_\theta (a_t \mid s_t)\right) \\
+&= \log p(s_0) + \sum_{t=0}^T \Bigg( \log p(s_{t+1} \mid s_t, a_t) + \log \pi_\theta (a_t \mid s_t) \Bigg)
+\end{align}
 $$
 
-giving us the following expression for the single-step MDP:
+Let's take a closer look at the gradient of $\log p(\tau)$ with respect to $\theta$:
 
 $$
-\nabla_\theta J(\theta) = \mathbb{E}_{s_0} \left[ \nabla_\theta \log \pi_\theta(a_0 \mid s_0) r_0 \right]
+\nabla_\theta \log p(\tau) = \cancel{\log p(s_0)} + \sum_{t=0}^T \Bigg( \cancel{\log p(s_{t+1} \mid s_t, a_t)} + \log \pi_\theta (a_t \mid s_t) \Bigg)
 $$
 
-With a bit of extra work, we can derive a similar formula for multi-step MDPs known as the **policy gradient theorem**:
+The distribution over initial states $p(s_0)$ is independent of $\theta$, as are the state transition dynamics. This leaves us with
 
 $$
-\nabla_\theta J(\theta) = \mathbb{E}_\tau \left[ \sum_{t=0}^T \nabla_\theta \log \pi_\theta (a_t \mid s_t) Q^{\pi_\theta} (s_t, a_t) \right]
+\nabla_\theta \log p(\tau) = \sum_{t=0}^T \log \pi_\theta (a_t \mid s_t)
 $$
 
-Where $a_t$ and $s_t$ are seen throughout the trajectory $\tau$.
+Substituting this back into our expression for the policy gradient, we get
 
-REINFORCE directly applies the policy gradient theorem by sampling this expectation and using it as an estimate for the gradient. We run a **rollout** of the policy $\pi_\theta$ in our environment for $T$ time steps, storing the states, actions, rewards, and done flags at each time step $t$. Then, we compute an empirical estimate for the gradient:
+$$
+\nabla_\theta J(\theta) = \sum_\tau  p(\tau) \Bigg( \sum_{t=0}^T \log \pi_\theta (a_t \mid s_t) \Bigg) G_0
+$$
+
+But this is exactly the form of an expectation over $\tau$!
+
+$$
+\nabla_\theta J(\theta) = \mathbb{E}_\tau \left[ \sum_{t=0}^T \log \pi_\theta (a_t \mid s_t) G_0 \right]
+$$
+
+For each action $a_t$, we essentially make a gradient step that changes $\log \pi_\theta (a_t \mid s_t)$ based on the scale of $G_0$. If we have a bad trajectory and $G_0 < 0$ then we decrease the log probability of each action along the trajectory, and if we have a good trajectory and $G_0 > 0$ then we increase the log probability of each action along the trajectory.
+
+This expression is known as the **policy gradient**, and is sufficient to do basic reinforcement learning. However, if we expand $G_0$, we see that
+
+$$
+\nabla_\theta J(\theta) = \mathbb{E}_\tau \left[ \sum_{t=0}^T \log \pi_\theta (a_t \mid s_t) \sum_{t=0}^T \gamma^t r_t \right]
+$$
+
+This means that we scale each action according to the rewards seen at every time step. But why should this be the case? Why would I change the probability of an action at time $t$ according to the reward seen at some earlier time $t' < t$?
+
+It turns out that we can actually drop terms where that is the case:
+
+$$
+\nabla_\theta J(\theta) = \mathbb{E}_\tau \left[ \sum_{t=0}^T \log \pi_\theta (a_t \mid s_t) \sum_{k=t}^T \gamma^k r_k \right]
+$$
+
+(see a proof [here](https://spinningup.openai.com/en/latest/spinningup/extra_pg_proof1.html)).
+
+The right hand term is
+
+$$
+\begin{align}
+\sum_{k=t}^T \gamma^k r_k &= \gamma^t \sum_{k=t}^T \gamma^{k-t} r_t \\
+&= \gamma^t G_t
+\end{align}
+$$
+
+which is just the discounted return $G_t$ but scaled by the discount factor $\gamma^t$. In practice, we drop the $\gamma^t$ term, giving us
+
+$$
+\nabla_\theta J(\theta) = \mathbb{E}_\tau \left[ \sum_{t=0}^T \log \pi_\theta (a_t \mid s_t) G_t \right]
+$$
+
+At each time step $t$ in the sum we have access to the $s_t$ and $a_t$. As a result, we can also write
+
+$$
+\nabla_\theta J(\theta) = \mathbb{E}_\tau \left[ \sum_{t=0}^T \log \pi_\theta (a_t \mid s_t) V^{\pi_\theta}(s_t) \right]
+$$
+
+since
+
+$$
+V^{\pi_\theta}(s_t) = \mathbb{E}_\tau \left[ G_t \mid s_t \right]
+$$
+
+Similarly, we can also write
+
+$$
+\nabla_\theta J(\theta) = \mathbb{E}_\tau \left[ \sum_{t=0}^T \log \pi_\theta (a_t \mid s_t) Q^{\pi_\theta}(s_t, a_t) \right]
+$$
+
+since
+
+$$
+Q^{\pi_\theta}(s_t, a_t) = \mathbb{E}_\tau \left[ G_t \mid s_t, a_t \right]
+$$
+
+REINFORCE directly applies the policy gradient theorem by sampling the expectation in the gradient and using it as an estimate for the gradient. We run a **rollout** of the policy $\pi_\theta$ in our environment for $T$ time steps, storing the states, actions, rewards, and done flags at each time step $t$. Then, we compute an empirical estimate for the gradient:
 
 $$
 \hat{g} = \sum_{t=0}^T \nabla_\theta \log \pi_\theta(a_t \mid s_t) G_t
 $$
 
-where we use $\hat{g}$ as a short hand for "estimate of the gradient". We replace $Q^{\pi_\theta} (s_t, a_t)$ with an empirical estimate $G_t$ (since $Q^{\pi_\theta} (s_t, a_t) = \mathbb{E}_\tau \left[ G_t \mid s_t, a_t \right]$).
+where we use $\hat{g}$ as a short hand for "estimate of the gradient".
 
 This can be easily implemented using an autograd library like PyTorch by defining a loss function:
 
@@ -131,21 +182,19 @@ $$
 
 which is the gradient we want. We can use this gradient for gradient *ascent* by flipping the sign, and doing gradient *descent*. This is how we will be implementing REINFORCE.
 
-### On-Policy vs Off-Policy Learning
-
 This is a good time to bring up the difference between **on-policy** learning and **off-policy** learning.
 
 **On-policy** learning requires that data used for training a policy $\pi$ is actually collected *by that policy*. Policy gradient-based algorithms, such as REINFORCE, are usually on-policy. This is evident in the form of the policy gradient theorem, where the expectation is taken over trajectories $\tau$, whose distribution depends directly on the policy $\pi$.
 
 **Off-policy** learning does not require that data used for training a policy $\pi$ be collected by that policy. For example, $Q$-learning (and deep $Q$-learning) are off-policy algorithms. $Q$-learning only requires data of the form $s_t, a_t, r_t, s_{t+1}$ to learn the $Q$-function. This data could easily be collected by a random policy.
 
-When using an on-policy algorithm, if we collect training data and then use that data to update our policy's parameters $\theta$, we cannot re-use that data for further training, since the updated policy no longer matches the policy that collected the data. This is the downside of on-policy algorithms.
+When using an on-policy algorithm, if we collect training data and then use that data to update our policy's parameters $\theta$, we cannot re-use that data for further training since the updated policy no longer matches the policy that collected the data. This is the downside of on-policy algorithms.
 
-### Parallel Environments
+
 
 To get a less variable estimate of the gradient $\hat{g}$, we can run multiple rollouts in parallel and compute the average gradient over each rollout. This stabilizes training and allows us to increase our learning rate since we can be more confident in out gradient estimate.
 
-Below we provide the same implementation for a vectorized environment that we used in the [previous post]({% post_url 2020-05-31-dqn %}) (with a minor change since we will be allowing non-discrete actions this time):
+Below we provide the same implementation for a vectorized environment that we used in the [previous post](dqn) (with a minor change since we will be allowing non-discrete actions this time):
 
 
 ```python
@@ -189,19 +238,15 @@ class VectorizedEnvWrapper(gym.Wrapper):
 
 Before we can fully implement REINFORCE, we need to look at the two most common types of stochastic policies: **categorical policies** and **diagonal Gaussian policies**.
 
-### Categorical Policies
-
 Categorical policies define a probability distribution over a discrete action space. The way that this is normally implemented is using a neural network with $\lvert \mathcal{A} \rvert$ output nodes, one for each action. A **softmax** activation is applied at the end to ensure the activations of the output layer are a probability distribution.
 
 $$
 a_i \to \frac{e^{a_i}}{\sum_j e^{a_j}}
 $$
 
-the exponentiation operation makes every output positive, and the division by the sum of the exponentiated outputs just normalizes activities so they sum to 1.
+the exponentiation operation makes every output positive, and the division by the sum of the exponentiated outputs just normalized activities so they sum to 1.
 
 ![categorical.png]({{site.baseurl}}/assets/{{page.folder}}/categorical.png)
-
-### Diagonal Gaussian Policies
 
 Diagonal Gaussian policies define a probability distribution over a continuous action space. In this case, actions are real-valued vectors, so we need to instead define a probability distribution over real-valued vectors. The most common way to do this is to use a diagonal Gaussian distribution, which is a multivariate Gaussian distribution with diagonal covariance matrix.
 
@@ -210,14 +255,15 @@ To implement this, we usually use a neural network to produce a mean vector $\mu
 We then sample actions by doing
 
 $$
-a_t \sim \mathcal{N}(\mu(s_t), \sigma)
+\begin{align}
+z &\sim \mathcal{N}(0, I) \\
+a_t &= \mu(s_t) + z \odot \sigma
+\end{align}
 $$
 
 ![diagonal-gaussian.png]({{site.baseurl}}/assets/{{page.folder}}/diagonal-gaussian.png)
 
 We usually learn $\log \sigma$ rather than $\sigma$, since $\log \sigma \in (-\infty, \infty)$ whereas $\sigma \in [0, \infty)$ (and ensuring bounds during optimization is difficult).
-
-## Implementing Stochastic Policies in PyTorch
 
 Below we implement both a diagonal Gaussian policy and categorical policy. We first define a base class `Policy`, then subclass this to override the definitions for `pi` and `__init__`.
 
@@ -343,7 +389,6 @@ G_t = r_t + \gamma (1-d_t) G_{t+1}
 $$
 
 and the fact that
-
 $$
 G_T = r_T
 $$
@@ -360,12 +405,10 @@ def calculate_returns(rewards, dones, gamma):
     return result
 ```
 
-## REINFORCE Training Loop
-
 Finally, we are ready to implement REINFORCE. In terms of our training loop, we will divide training into two parts:
 
 1. Epochs. These form the outer loop of our training algorithm. We will have one policy update per epoch.
-2. Rollouts. These form the inner loop of our training algorithm. We will run the policy in multiple parallel environments for a fixed number of time steps $T$ and collect the states, actions, rewards, and done flags encountered in each environment.
+2. Rollouts. These form the inner loop of our training algorithm. We will run the policy in multiple parallel environments for a fixed number of time steps $T$ and collect the states, actions, rewards, and done flags encountered in each environemnt.
 
 
 ```python
@@ -416,11 +459,9 @@ def REINFORCE(env, agent, gamma=0.99, epochs=100, T=1000):
     return agent
 ```
 
-## Experiments
-
 First we will run a `Categorical` policy on the `CartPole-v0` environment from the previous post. This environment is very simple and works well as a first test bed for algorithms using discrete action spaces.
 
-Because the environment has a small time horizon ($T=200$) we will use $\gamma=0.99$ which is the default. Also, we will use 32 environments, which is a good balance between wall clock time and improved data collection. Because we are using a basic linear policy, we can use a relatively high learning rate of 0.1.
+Because the environment has a small time horizon ($T=200$) we will use $\gamma=0.99$ which is the default. Also, we will use 32 environment, which is a good balance between wall clock time and improved data collection. Because we are using a basic linear policy, we can use a relatively high learning rate of 0.1.
 
 
 ```python
@@ -432,12 +473,15 @@ agent = REINFORCE(env, agent)
     99/100:200.03086419753086
 
 
-![png]({{site.baseurl}}/assets/{{page.folder}}/output_42_1.png)
+![png]({{site.baseurl}}/assets/{{page.folder}}/output_53_1.png)
 
 
 For the next environment, we will be using `CartPoleSwingUp-v0`, which is *not* included in the basic `gym` installation. It can be installed with `pip install gym-cartpole-swingup`, and then imported to register the environment with `gym` (so we can create it via `gym.make`).
 
 This environment is very simple. It is like `CartPole-v0`, except the pole begins hanging down and must be swung into the upward position. The agent must learn to rapidly accelerate to add momentum to the pole, then switch directions to bring the pole above horizontal. This requires some level of exploration, so to improve our odds of randomly choosing good actions we massively scale up the number of parallel environments to 256. We also increase $\gamma = 0.999$ to account for the longer time horizon of this problem (capped at the length of the rollout, $T=1000$). With this many environments, we only need about 20 epochs to get a decent policy. We decrease the learning rate since we are using a larger network (2 hidden layers) and since the problem is harder and we don't want to make updates that overshoot the optimal policy.
+
+In honesty, running this code with more environments, longer rollouts, more epochs and a smaller learning rate might be able to discover a really good policy that consistently performs well.
+
 
 ```python
 import gym_cartpole_swingup
@@ -453,7 +497,7 @@ agent = REINFORCE(env, agent, gamma=0.999, epochs=20)
     19/20:5.7961581938336594
 
 
-![png]({{site.baseurl}}/assets/{{page.folder}}/output_45_1.png)
+![png]({{site.baseurl}}/assets/{{page.folder}}/output_56_1.png)
 
 
-I hope that this thorough introduction to policy gradients has been helpful! In the next posts, we will dive deeper into actor-critic methods and more advanced policy gradient methods.
+I hope that this thorough introduction to policy gradients has been helpful. In the next posts, we will diver deeper into actor-critic methods and more advanced policy gradient methods.
