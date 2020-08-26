@@ -80,25 +80,25 @@ Let's take a closer look at the gradient of $\log p(\tau)$ with respect to $\the
 
 $$
 \require{cancel}
-\nabla_\theta \log p(\tau) = \cancel{\log p(s_0)} + \sum_{t=0}^T \Bigg( \cancel{\log p(s_{t+1} \mid s_t, a_t)} + \log \pi_\theta (a_t \mid s_t) \Bigg)
+\nabla_\theta \log p(\tau) = \cancel{\nabla_\theta \log p(s_0)} + \sum_{t=0}^T \Bigg( \cancel{\nabla_\theta \log p(s_{t+1} \mid s_t, a_t)} + \nabla_\theta \log \pi_\theta (a_t \mid s_t) \Bigg)
 $$
 
 The distribution over initial states $p(s_0)$ is independent of $\theta$, as are the state transition dynamics. This leaves us with
 
 $$
-\nabla_\theta \log p(\tau) = \sum_{t=0}^T \log \pi_\theta (a_t \mid s_t)
+\nabla_\theta \log p(\tau) = \sum_{t=0}^T \nabla_\theta \log \pi_\theta (a_t \mid s_t)
 $$
 
 Substituting this back into our expression for the policy gradient, we get
 
 $$
-\nabla_\theta J(\theta) = \sum_\tau  p(\tau) \Bigg( \sum_{t=0}^T \log \pi_\theta (a_t \mid s_t) \Bigg) G_0
+\nabla_\theta J(\theta) = \sum_\tau  p(\tau) \Bigg( \sum_{t=0}^T \nabla_\theta \log \pi_\theta (a_t \mid s_t) \Bigg) G_0
 $$
 
 But this is exactly the form of an expectation over $\tau$!
 
 $$
-\nabla_\theta J(\theta) = \mathbb{E}_\tau \left[ \sum_{t=0}^T \log \pi_\theta (a_t \mid s_t) G_0 \right]
+\nabla_\theta J(\theta) = \mathbb{E}_\tau \left[ \sum_{t=0}^T \nabla_\theta \log \pi_\theta (a_t \mid s_t) G_0 \right]
 $$
 
 For each action $a_t$, we essentially make a gradient step that changes $\log \pi_\theta (a_t \mid s_t)$ based on the scale of $G_0$. If we have a bad trajectory and $G_0 < 0$ then we decrease the log probability of each action along the trajectory, and if we have a good trajectory and $G_0 > 0$ then we increase the log probability of each action along the trajectory.
@@ -106,7 +106,7 @@ For each action $a_t$, we essentially make a gradient step that changes $\log \p
 This expression is known as the **policy gradient**, and is sufficient to do basic reinforcement learning. However, if we expand $G_0$, we see that
 
 $$
-\nabla_\theta J(\theta) = \mathbb{E}_\tau \left[ \sum_{t=0}^T \log \pi_\theta (a_t \mid s_t) \sum_{t=0}^T \gamma^t r_t \right]
+\nabla_\theta J(\theta) = \mathbb{E}_\tau \left[ \sum_{t=0}^T \nabla_\theta \log \pi_\theta (a_t \mid s_t) \sum_{t=0}^T \gamma^t r_t \right]
 $$
 
 This means that we scale each action according to the rewards seen at every time step. But why should this be the case? Why would I change the probability of an action at time $t$ according to the reward seen at some earlier time $t' < t$?
@@ -114,7 +114,7 @@ This means that we scale each action according to the rewards seen at every time
 It turns out that we can actually drop terms where that is the case:
 
 $$
-\nabla_\theta J(\theta) = \mathbb{E}_\tau \left[ \sum_{t=0}^T \log \pi_\theta (a_t \mid s_t) \sum_{k=t}^T \gamma^k r_k \right]
+\nabla_\theta J(\theta) = \mathbb{E}_\tau \left[ \sum_{t=0}^T \nabla_\theta  \log \pi_\theta (a_t \mid s_t) \sum_{k=t}^T \gamma^k r_k \right]
 $$
 
 (see a proof [here](https://spinningup.openai.com/en/latest/spinningup/extra_pg_proof1.html)).
@@ -131,13 +131,13 @@ $$
 which is just the discounted return $G_t$ but scaled by the discount factor $\gamma^t$. In practice, we drop the $\gamma^t$ term, giving us
 
 $$
-\nabla_\theta J(\theta) = \mathbb{E}_\tau \left[ \sum_{t=0}^T \log \pi_\theta (a_t \mid s_t) G_t \right]
+\nabla_\theta J(\theta) = \mathbb{E}_\tau \left[ \sum_{t=0}^T \nabla_\theta  \log \pi_\theta (a_t \mid s_t) G_t \right]
 $$
 
 At each time step $t$ in the sum we have access to the $s_t$ and $a_t$. As a result, we can also write
 
 $$
-\nabla_\theta J(\theta) = \mathbb{E}_\tau \left[ \sum_{t=0}^T \log \pi_\theta (a_t \mid s_t) V^{\pi_\theta}(s_t) \right]
+\nabla_\theta J(\theta) = \mathbb{E}_\tau \left[ \sum_{t=0}^T \nabla_\theta  \log \pi_\theta (a_t \mid s_t) V^{\pi_\theta}(s_t) \right]
 $$
 
 since
@@ -149,7 +149,7 @@ $$
 Similarly, we can also write
 
 $$
-\nabla_\theta J(\theta) = \mathbb{E}_\tau \left[ \sum_{t=0}^T \log \pi_\theta (a_t \mid s_t) Q^{\pi_\theta}(s_t, a_t) \right]
+\nabla_\theta J(\theta) = \mathbb{E}_\tau \left[ \sum_{t=0}^T \nabla_\theta \log \pi_\theta (a_t \mid s_t) Q^{\pi_\theta}(s_t, a_t) \right]
 $$
 
 since
