@@ -390,6 +390,7 @@ G_t = r_t + \gamma (1-d_t) G_{t+1}
 $$
 
 and the fact that
+
 $$
 G_T = r_T
 $$
